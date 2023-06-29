@@ -1,6 +1,6 @@
 import { Box, Paper } from "@mui/material";
 import MainContainer from "../components/layout/MainContainer";
-import LoginBox from "../components/login/LoginBox";
+import LoginBox from "../components/auth/LoginBox";
 import classes from './index.module.css';
 import classNames from "classnames";
 
