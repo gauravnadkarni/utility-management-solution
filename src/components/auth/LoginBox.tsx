@@ -1,6 +1,11 @@
 import { Button, Card, CardActions, CardContent, FormControl, FormLabel, TextField } from "@mui/material"
+import { useForm, Controller, SubmitHandler } from "react-hook-form"
+import type { NextPage } from "next";
+import { useDispatch, useSelector } from "react-redux";
 import { styled } from '@mui/material/styles';
 import classes from './LoginBox.module.css';
+import { selectAuthState, setAuthState } from "../auth/store/auth-slice";
+
 
 
 const CssTextField = styled(TextField)({
@@ -23,19 +28,36 @@ const CssTextField = styled(TextField)({
     },
 });
 
-const LoginBox = () => {
+interface IFormInputs {
+    username: string
+    password: string
+ }
+
+const LoginBox:NextPage = () => {
+    const authState:boolean = useSelector(selectAuthState);
+    console.log(authState)
+    const dispatch = useDispatch();
+    const onSignInButtonClick = () => {
+        dispatch(setAuthState(!authState))
+    }
+    
     return (
         <Card>
             <CardContent classes={{root: classes.muiRootCardContent}}>
                 <FormControl classes={{root: classes.muiRootFormControl}}>
-                    <CssTextField label="Username" id="custom-css-outlined-input" />
+                    <CssTextField label="Username" id="custom-css-outlined-input" placeholder="Username"/>
                 </FormControl>
                 <FormControl classes={{root: classes.muiRootFormControl}}>
-                    <CssTextField label="Password" id="custom-css-outlined-input" type="password"/>
+                    <CssTextField label="Password" id="custom-css-outlined-input" type="password" placeholder="Password"/>
                 </FormControl>
             </CardContent>
             <CardActions classes={{root:classes.muiRootCardActions}}>
-                <Button variant="contained">Sign In</Button>
+                <Button 
+                    variant="contained"
+                    onClick={onSignInButtonClick}
+                >
+                    Sign In
+                </Button>
             </CardActions>
         </Card>
     )
