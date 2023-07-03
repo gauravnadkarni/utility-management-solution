@@ -8,7 +8,6 @@ export default function MainContainer(props:any) {
     <React.Fragment>
       <CssBaseline />
       <Container maxWidth="xl">
-        {/*<Box sx={{ bgcolor: '#cfe8fc', height: '100vh' }} />*/}
         {props.children}
       </Container>
     </React.Fragment>

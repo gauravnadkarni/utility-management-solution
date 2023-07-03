@@ -15,3 +15,7 @@
   h6 {
     font-family: 'Lato', sans-serif;
   }
+
+  .form-field-validation-error {
+    color: red;
+  }
