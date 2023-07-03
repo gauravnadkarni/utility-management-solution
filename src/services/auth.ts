@@ -1,3 +1,4 @@
+import GenericObject from "@/types/generic-object";
 import HttpHandler from "@/utilities"
 
 export default class AuthService {
@@ -13,5 +14,11 @@ export default class AuthService {
         return await HttpHandler.post("/api/auth/signin",data,{
 
         });
+    }
+
+    async checkSignIn(data:GenericObject) {
+        return await HttpHandler.post("/api/auth/checkSessionValidity",{
+
+        },{});
     }
 }

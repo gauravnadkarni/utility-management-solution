@@ -4,13 +4,13 @@ import Header, { HeaderProps } from './Header';
 import classes from './Layout.module.css';
 import { PropsWithChildren, useState } from 'react';
 import { 
-  selectAuthState,
+  selectUser,
 } from "../auth/store/auth-slice";
 import { useAppSelector } from '../../hooks';
 
 function Layout(props:PropsWithChildren) {
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-  const authState:boolean = useAppSelector(selectAuthState);
+  const selectUserState:{userId:number} = useAppSelector(selectUser);
 
   const headerProps:HeaderProps = {
     settings:[{
@@ -33,7 +33,7 @@ function Layout(props:PropsWithChildren) {
       menuAnchor: anchorElUser,
     }, 
     userInfo: {
-      isSignedIn: authState,
+      isSignedIn: selectUserState.userId !== -1 ? true : false,
       avatar: '/static/images/avatar/2.jpg'
     },
   };

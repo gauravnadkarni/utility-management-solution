@@ -1,26 +1,38 @@
 import type { NextPage } from "next";
 import { 
-    selectAuthState,
+    selectCheckingSignedIn,
+    selectUser, signInCheckCall,
 } from "../store/auth-slice";
-import { useAppSelector } from "../../../hooks";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { NextRouter, useRouter } from "next/router";
 import { Fragment, PropsWithChildren, useEffect } from "react";
+import Loader from "../../utility/loader";
 
 type NonSecuredProps = {
     children: React.ReactNode; // 👈️ type children
 };
 
-const NonSecured:NextPage<NonSecuredProps> = (props:PropsWithChildren<NonSecuredProps>) => {
+const NonSecured:NextPage<PropsWithChildren<NonSecuredProps>> = (props:PropsWithChildren<NonSecuredProps>) => {
     const router:NextRouter = useRouter();
-    const authState:boolean = useAppSelector(selectAuthState);
+    const user:{userId:number} = useAppSelector(selectUser);
+    const checkingSignedIn:"checking" | "checked" | null = useAppSelector(selectCheckingSignedIn);
+    const dispatch = useAppDispatch();
 
     useEffect(()=>{
-        if(authState === true) {
-            router.push('/dashboard');
+        if(checkingSignedIn === null) {
+            dispatch(signInCheckCall({}));
         }
-    },[]);
 
-    return <Fragment>{props.children}</Fragment>
+        if(checkingSignedIn === "checked" && user.userId !== -1) {
+            router.push("/dashboard");
+        }
+    },[checkingSignedIn, user]);
+
+    if(checkingSignedIn === "checked" && user.userId === -1) {
+        return (<Fragment>{props.children}</Fragment>)
+    }
+
+    return (<Loader varient="indeterminate" color="primary" />);
 }
 
 export default NonSecured

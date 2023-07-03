@@ -4,7 +4,7 @@ import type { NextPage } from "next";
 import { styled } from '@mui/material/styles';
 import classes from './LoginBox.module.css';
 import { 
-    selectAuthState, signIn,
+    selectUser, signInCall,
 } from "../auth/store/auth-slice";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { NextRouter, useRouter } from "next/router";
@@ -61,10 +61,10 @@ interface FormInputs {
 
 const LoginBox:NextPage = () => {
     const router:NextRouter = useRouter();
-    const authState:boolean = useAppSelector(selectAuthState);
+    const userState:{userId:number} = useAppSelector(selectUser);
     const dispatch = useAppDispatch();
     const onSubmit: SubmitHandler<FormInputs> = (data:any) => {
-        dispatch(signIn(data));
+        dispatch(signInCall(data));
     }
     
     const { 

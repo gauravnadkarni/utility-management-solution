@@ -3,29 +3,43 @@ import { AppState } from "../../../store";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { HYDRATE } from "next-redux-wrapper";
 import AuthService from "@/services/auth";
+import GenericObject from "@/types/generic-object";
 
 // Type for our state
 export interface AuthState {
-  checkingSignIn: boolean
-  isSignedIn: boolean;
+  checkingSignIn: null | 'checking' | 'checked'
   isError: boolean;
   signInError:string
+  user: {
+    userId:number
+  }
 }
 
 // Initial state
 const initialState: AuthState = {
-    checkingSignIn: false,
-    isSignedIn: false,
+    checkingSignIn: null,
     isError: false,
-    signInError: ""
+    signInError: "",
+    user: {
+      userId:-1
+    }
 };
 
-const signInCall = createAsyncThunk(
+export const signInCall = createAsyncThunk(
   'auth/signIn',
   async (signInInfo:{username:string, password:string}, thunkAPI:ThunkAPI) => {
     const authService:AuthService = new AuthService();
     const data = await authService.signIn(signInInfo);
-    return data.data;
+    return data;
+  }
+)
+
+export const signInCheckCall = createAsyncThunk(
+  'auth/checksignIn',
+  async (data: GenericObject, thunkAPI:ThunkAPI) => {
+    const authService:AuthService = new AuthService();
+    const res = await authService.checkSignIn(data);
+    return res;
   }
 )
 
@@ -40,39 +54,64 @@ export const authSlice = createSlice({
     builder.addCase(HYDRATE, (state, action:any) => {
       return {
         ...state,
-        ...action.payload.auth,
+        ...action.payload.data.auth,
       };
     }).addCase(signInCall.pending,(state, action) => {
       return {
         ...state,
-        checkingSignIn: true
+        checkingSignIn: "checking"
       }
-    }).addCase(signInCall.fulfilled,(state, action) => {
+    }).addCase(signInCall.fulfilled,(state, action:any) => {
       return {
         ...state,
-        isSignedIn: true,
         isError: false,
-        checkingSignIn: false,
+        checkingSignIn: "checked",
+        user: {
+          userId: action.payload.data.userId
+        }
       }
     }).addCase(signInCall.rejected,(state, action:any) => {
       return {
         ...state,
-        isSignedIn: false,
         isError: true,
-        signInError: action.payload.message,
-        checkingSignIn: false,
+        signInError: action.payload.data.message,
+        checkingSignIn: "checked",
+      }
+    }).addCase(signInCheckCall.pending,(state, action) => {
+      return {
+        ...state,
+        user: {
+          userId:-1
+        },
+        checkingSignIn: "checking"
+      }
+    }).addCase(signInCheckCall.fulfilled,(state, action:any) => {
+      return {
+        ...state,
+        user: {
+          userId: action.payload.data.userId
+        },
+        isError: false,
+        checkingSignIn: "checked",
+      }
+    }).addCase(signInCheckCall.rejected,(state, action:any) => {
+      return {
+        ...state,
+        isError: true,
+        user: {
+          userId:-1
+        },
+        signInError: action.error.message,
+        checkingSignIn: "checked",
       }
     });
   },
 });
 
 //export const {  } = authSlice.actions;
-
-export const selectAuthState = (state: AppState) => state.auth.isSignedIn;
-export const selectIfSignedIn = (state: AppState) => state.auth.checkingSignIn;
+export const selectCheckingSignedIn = (state: AppState) => state.auth.checkingSignIn;
 export const selectIsError = (state: AppState) => state.auth.isError;
 export const selectError = (state: AppState) => state.auth.signInError;
-
-export const signIn = signInCall;
+export const selectUser = (state: AppState) => state.auth.user;
 
 export default authSlice.reducer;
